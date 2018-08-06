@@ -13,7 +13,6 @@ var Exceptions = require("../exceptions");
 var ORIGIN = CONSTANTS.WEBHOST.slice(0, -1); // Trailing / in origin
 
 // iPhone probably works best, even from android previosly done request
-var iPhoneUserAgent = 'Instagram 19.0.0.27.91 (iPhone6,1; iPhone OS 9_3_1; en_US; en; scale=2.00; gamut=normal; 640x1136) AppleWebKit/420+';
 var iPhoneUserAgentHtml = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13E238 Instagram 10.28.0 (iPhone6,1; iPhone OS 9_3_1; en_US; en; scale=2.00; gamut=normal; 640x1136)'
 
 var EMAIL_FIELD_REGEXP = /email.*value(.*)"/i;
@@ -50,14 +49,11 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
         if(skipResetStep) return res();
         return res(that.reset(checkpointError))
     })
-    .then(function() {
-        return new WebRequest(session)
-            .setMethod('GET')
-            .setUrl(that.apiUrl)
-            .setHeaders({
-                'User-Agent': iPhoneUserAgent
-            })
-            .send({followRedirect: true})
+        .then(function() {
+            return new WebRequest(session)
+                .setMethod('GET')
+                .setUrl(that.apiUrl)
+                .send({followRedirect: true})
         })
         .catch(errors.StatusCodeError, function(error){
             return error.response;
@@ -70,21 +66,18 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
                 throw new TypeError('Invalid response. JSON expected');
             }
             //Using html unlock if native is not supported
-        if(json.challenge && json.challenge.native_flow===false) return that.resolveHtml(checkpointError,defaultMethod)
-        //Challenge is not required
-        if(json.status==='ok' && json.action==='close') throw new Exceptions.NoChallengeRequired;
+            if(json.challenge && json.challenge.native_flow===false) return that.resolveHtml(checkpointError,defaultMethod)
+            //Challenge is not required
+            if(json.status==='ok' && json.action==='close') throw new Exceptions.NoChallengeRequired;
 
-        //Using API-version of challenge
-        switch(json.step_name){
-            case 'select_verify_method':{
-                return new WebRequest(session)
-                    .setMethod('POST')
-                    .setUrl(that.apiUrl)
-                    .setHeaders({
-                        'User-Agent': iPhoneUserAgent
-                    })
-                    .setData({
-                        "choice": defaultMethod==='email' ? 1 : 0
+            //Using API-version of challenge
+            switch(json.step_name){
+                case 'select_verify_method':{
+                    return new WebRequest(session)
+                        .setMethod('POST')
+                        .setUrl(that.apiUrl)
+                        .setData({
+                            "choice": defaultMethod==='email' ? 1 : 0
                         })
                         .send({followRedirect: true})
                         .then(function(){
@@ -179,17 +172,14 @@ Challenge.reset = function(checkpointError){
         .setMethod('POST')
         .setBodyType('form')
         .setUrl(that.apiUrl.replace('/challenge/','/challenge/reset/'))
-        .setHeaders({
-            'User-Agent': iPhoneUserAgent
-        })
         .signPayload()
         .send({followRedirect: true})
-    .catch(function(error){
-        return error.response;
-    })
-    .then(function(response){
-        return that;
-    })
+        .catch(function(error){
+            return error.response;
+        })
+        .then(function(response){
+            return that;
+        })
 }
 Challenge.prototype.code = function(code){
     var that = this;
@@ -197,9 +187,6 @@ Challenge.prototype.code = function(code){
     return new WebRequest(that.session)
         .setMethod('POST')
         .setUrl(that.apiUrl)
-        .setHeaders({
-            'User-Agent': iPhoneUserAgent
-        })
         .setBodyType('form')
         .setData({
             "security_code":code
@@ -256,9 +243,6 @@ PhoneVerificationChallenge.prototype.phone = function(phone){
     return new WebRequest(that.session)
         .setMethod('POST')
         .setUrl(that.apiUrl)
-        .setHeaders({
-            'User-Agent': iPhoneUserAgent
-        })
         .setBodyType('form')
         .setData({
             "phone_number": _phone
