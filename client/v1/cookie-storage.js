@@ -63,6 +63,27 @@ CookieStorage.prototype.getAccountId = function () {
                 throw new Exceptions.CookieNotValidError("ds_user_id");
             }
         })
+        .catch(Exceptions.CookieNotValidError, function (error) {
+            return self.getSessionId()
+                .then(function (value) {
+                    const indexOfToken = value.indexOf('%22_token%22%3A%22');
+                    if(indexOfToken > -1){
+                        const size = value.length;
+                        const sliceEnd = size < indexOfToken + 40 ? size : indexOfToken + 40;
+                        value = value.slice(indexOfToken + 18, sliceEnd);
+                        const indexOfNext = value.indexOf("%3A");
+                        if(indexOfNext > -1){
+                            return value.slice(0, indexOfNext);
+                        }else{
+                            throw new Exceptions.CookieNotValidError("ds_user_id");
+                        }
+                    }else{
+                        throw new Exceptions.CookieNotValidError("ds_user_id");
+                    }
+                }).catch(Exceptions.CookieNotValidError, function (error) {
+                    throw new Exceptions.CookieNotValidError("ds_user_id");
+                })
+        })
 };
 
 
