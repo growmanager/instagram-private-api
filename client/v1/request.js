@@ -343,6 +343,10 @@ Request.prototype.afterError = function (error, request, attemps) {
     throw error;
 }
 
+Request.generalAfterError = function (error, request, attemps) {
+    throw error;
+}
+
 
 Request.prototype.send = function (options, attemps) {
     var that = this;
@@ -399,5 +403,8 @@ Request.prototype.send = function (options, attemps) {
         })
         .catch(function(error) {
             return that.afterError(error, options, attemps)
+        })
+        .catch(function(error) {
+            return Request.generalAfterError(error, options, attemps)
         })
 }

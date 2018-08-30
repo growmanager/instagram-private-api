@@ -63,6 +63,15 @@ exports.AuthenticationError = AuthenticationError;
 
 
 
+function LoginRequiredError(message) {
+    this.name = "LoginRequiredError";
+    this.message = message || "Not possible to login";
+}
+util.inherits(LoginRequiredError, APIError);
+exports.LoginRequiredError = LoginRequiredError;
+
+
+
 function ParseError(response, request) {
     this.name = "ParseError";
     this.message = "Not possible to parse API response";

@@ -116,4 +116,7 @@ WebRequest.prototype.send = function (options) {
         .catch(function(error) {
             return that.afterError(error, options, 0)
         })
+        .catch(function(error) {
+            return Request.generalAfterError(error, options, 0)
+        })
 }
