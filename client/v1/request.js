@@ -405,6 +405,6 @@ Request.prototype.send = function (options, attemps) {
             return that.afterError(error, options, attemps)
         })
         .catch(function(error) {
-            return Request.generalAfterError(error, options, attemps)
+            return Request.generalAfterError(error, that, attemps)
         })
 }
