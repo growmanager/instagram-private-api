@@ -318,9 +318,11 @@ Request.prototype.errorMiddleware = function (response) {
     if (json.message == 'challenge_required')
         throw new Exceptions.CheckpointError(json, this.session);
     if (json.message == 'login_required')
-        throw new Exceptions.AuthenticationError("Login required to process this request");
+        throw new Exceptions.LoginRequiredError("Login required to process this request");
     if (json.error_type == 'sentry_block')
         throw new Exceptions.SentryBlockError(json);
+    if (json.message.indexOf('following the max limit') !== -1)
+        throw new Exceptions.TooManyFollowsError();
     if (response.statusCode===429 || _.isString(json.message) && json.message.toLowerCase().indexOf('too many requests') !== -1)
         throw new Exceptions.RequestsLimitError();
     if (_.isString(json.message) && json.message.toLowerCase().indexOf('not authorized to view user') !== -1) 
