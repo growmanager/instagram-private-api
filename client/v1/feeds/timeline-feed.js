@@ -20,7 +20,7 @@ TimelineFeed.prototype.get = function () {
         .then(function(id) {
             var rankToken = Helpers.buildRankToken(id);
             return new Request(that.session)
-                .setMethod('GET')
+                .setMethod('POST')
                 .setResource('timelineFeed', {
                     maxId: that.getCursor(),
                     rankToken: rankToken
