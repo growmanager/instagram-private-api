@@ -19,12 +19,16 @@ TimelineFeed.prototype.get = function () {
     return this.session.getAccountId()
         .then(function(id) {
             var rankToken = Helpers.buildRankToken(id);
+            var data = {
+                rank_token: rankToken
+            };
+            if(that.getCursor()){
+                data.max_id = that.getCursor();
+            }
             return new Request(that.session)
                 .setMethod('POST')
-                .setResource('timelineFeed', {
-                    maxId: that.getCursor(),
-                    rankToken: rankToken
-                })
+                .setResource('timelineFeed')
+                .setData(data)
                 .send();
         })
         .then(function(data) {
