@@ -160,9 +160,6 @@ Session.login = function(session, username, password) {
             return [session, new Timeline(session).get()];
         })
         .spread(function (session) {
-            return [session, Thread.recentRecipients(session)];
-        })
-        .spread(function (session) {
             return [session, new Inbox(session).get()];
         })
         .spread(function (session) {
