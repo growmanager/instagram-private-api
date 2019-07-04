@@ -38,16 +38,17 @@ Comment.prototype.getParams = function () {
 };
 
 
-Comment.create = function(session, mediaId, text) {
+Comment.create = function(session, mediaId, text, breadcrumb) {
     return new Request(session)
         .setMethod('POST')
         .setResource('comment', {id: mediaId})
         .generateUUID()
         .setData({
             media_id: mediaId,
-            src: "profile",
+            containermodule: 'self_comments_v2',
             comment_text: text,
-            idempotence_token: crypto.createHash('md5').update(text).digest('hex')
+            idempotence_token: crypto.createHash('md5').update(text).digest('hex'),
+            user_breadcrumb: breadcrumb
         })
         .signPayload()
         .send()
