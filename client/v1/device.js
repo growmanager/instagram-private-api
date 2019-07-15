@@ -132,7 +132,7 @@ Object.defineProperty(Device.prototype, "language", {
 
 Device.prototype.userAgent = function(version) {
     var agent = [this.api + "/" + this.release, this.dpi + 'dpi', 
-        this.resolution, this.info.manufacturer, this.info.model, this.info.device, this.language];    
+        this.resolution, this.info.manufacturer, this.info.model, this.info.device, this.language, CONSTANTS.PRIVATE_KEY.APP_VERSION_CODE];
     return CONSTANTS.instagramAgentTemplate({
         agent: agent.join('; '),
         version: version || CONSTANTS.PRIVATE_KEY.APP_VERSION
