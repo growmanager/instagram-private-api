@@ -6,7 +6,7 @@ var camelKeys = require('camelcase-keys');
 function InstagramResource(session, params) {
     EventEmitter.call(this);
     var Session = require("./session");
-    if (!(session instanceof Session))
+    if (!'nocheck'.equals(session) && !(session instanceof Session))
         throw new Error("Argument `session` is not instace of Session");
     this._session = session;
     this._params = {};
