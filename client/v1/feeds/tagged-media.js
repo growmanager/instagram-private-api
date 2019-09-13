@@ -2,10 +2,11 @@ var _ = require('lodash');
 var util = require('util');
 var FeedBase = require('./feed-base');
 
-function TaggedMediaFeed(session, tag, limit, includeRankeds) {
+function TaggedMediaFeed(session, tag, limit, includeRankeds, forStories = false) {
     this.tag = tag;
     this.limit = parseInt(limit) || null;
     this.includeRankeds = includeRankeds;
+    this.forStories = forStories;
     FeedBase.apply(this, arguments);
 }
 util.inherits(TaggedMediaFeed, FeedBase);
@@ -30,6 +31,9 @@ TaggedMediaFeed.prototype.get = function () {
                 })
                 .send()
                 .then(function(data) {
+                    if(that.forStories){
+                        return data.story ? data.story : {};
+                    }
                     that.moreAvailable = data.more_available && !!data.next_max_id;
                     if (that.moreAvailable)
                         that.setCursor(data.next_max_id);

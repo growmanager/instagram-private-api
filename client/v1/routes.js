@@ -14,7 +14,11 @@ _.each(CONSTANTS.WEB_ROUTES, function (val, key) {
 exports.getUrl = function(key, data) {
     if(!_.isFunction(URLs[key])) 
         throw new Error("Url with key `"+ key +"` is not available");
-    return CONSTANTS.API_ENDPOINT + URLs[key](data || {});   
+    if(key.indexOf('_v2') > -1){
+        return CONSTANTS.API_ENDPOINT2 + URLs[key](data || {});
+    }else{
+        return CONSTANTS.API_ENDPOINT + URLs[key](data || {});
+    }
 }
 
 exports.getWebUrl = function(key, data) {

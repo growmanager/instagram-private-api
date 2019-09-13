@@ -2,10 +2,11 @@ var _ = require('lodash');
 var util = require('util');
 var FeedBase = require('./feed-base');
 
-function LocationMediaFeed(session, locationId, limit, includeRankeds) {
+function LocationMediaFeed(session, locationId, limit, includeRankeds, forStories = false) {
     this.limit = parseInt(limit) || null;
     this.locationId = locationId;
     this.includeRankeds = includeRankeds;
+    this.forStories = forStories;
     FeedBase.apply(this, arguments);
 }
 util.inherits(LocationMediaFeed, FeedBase);
@@ -50,6 +51,39 @@ LocationMediaFeed.prototype.get = function () {
             return _.map(items, function (medium) {
                 return new Media(that.session, medium);
             });
+        })
+        // will throw an error with 500 which turn to parse error
+        .catch(Exceptions.ParseError, function(){
+            throw new Exceptions.PlaceNotFound();
+        })
+};
+
+LocationMediaFeed.prototype.getOldVersion = function () {
+    var that = this;
+    return new Request(that.session)
+        .setMethod('GET')
+        .setResource('locationFeedOld', {
+            id: that.locationId,
+            maxId: that.getCursor(),
+            rankToken: Helpers.generateUUID()
+        })
+        .send()
+        .then(function(data) {
+            if(that.forStories){
+                return data.story ? data.story : {};
+            }
+            that.moreAvailable = data.more_available && !!data.next_max_id;
+            if (that.moreAvailable)
+                that.setCursor(data.next_max_id);
+            if(that.includeRankeds){
+                return _.map(_.isEmpty(data.items) ? data.ranked_items : data.items.concat(data.ranked_items), function (medium) {
+                    return new Media(that.session, medium);
+                });
+            }else{
+                return _.map(_.isEmpty(data.items) ? data.ranked_items : data.items, function (medium) {
+                    return new Media(that.session, medium);
+                });
+            }
         })
         // will throw an error with 500 which turn to parse error
         .catch(Exceptions.ParseError, function(){
