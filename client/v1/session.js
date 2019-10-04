@@ -145,27 +145,7 @@ Session.login = function(session, username, password) {
             }
             throw error;
         })
-        .then(function () {
-            return [session, QE.sync(session)];
-        })
-        .spread(function (session) {
-            var autocomplete = Relationship.autocompleteUserList(session)
-                .catch(Exceptions.RequestsLimitError, function() {
-                    // autocompleteUserList has ability to fail often
-                    return false;
-                })
-            return [session, autocomplete];
-        })
-        .spread(function (session) {
-            return [session, new Timeline(session).get()];
-        })
-        .spread(function (session) {
-            return [session, new Inbox(session).get()];
-        })
-        .spread(function (session) {
-            return [session, Megaphone.logSeenMainFeed(session)];
-        })
-        .spread(function(session) {
+        .then(function() {
             return session;
         })
         .catch(Exceptions.CheckpointError, function(error) {
