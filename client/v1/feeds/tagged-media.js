@@ -32,7 +32,7 @@ TaggedMediaFeed.prototype.get = function () {
                 .send()
                 .then(function(data) {
                     if(that.forStories){
-                        return data.story ? data.story : {};
+                        return data;
                     }
                     that.moreAvailable = data.more_available && !!data.next_max_id;
                     if (that.moreAvailable)
