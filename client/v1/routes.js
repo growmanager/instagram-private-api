@@ -12,10 +12,12 @@ _.each(CONSTANTS.WEB_ROUTES, function (val, key) {
 });
 
 exports.getUrl = function(key, data) {
-    if(!_.isFunction(URLs[key])) 
+    if(!_.isFunction(URLs[key]))
         throw new Error("Url with key `"+ key +"` is not available");
     if(key.indexOf('_v2') > -1){
         return CONSTANTS.API_ENDPOINT2 + URLs[key](data || {});
+    }else if(key.indexOf('_vnone') > -1){
+        return CONSTANTS.HOST + URLs[key](data || {});
     }else{
         return CONSTANTS.API_ENDPOINT + URLs[key](data || {});
     }

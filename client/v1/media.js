@@ -174,35 +174,36 @@ Media.configurePhoto = function (session, uploadId, caption, width, height, user
 
     const CROP = 1;
     return session.getAccountId()
-        .then(function(accountId){
+        .then(async function(accountId){
             var payload = pruned({
                 source_type: "4",
+                media_folder: 'Camera',
                 caption: caption,
                 upload_id: uploadId,
                 usertags: JSON.stringify(userTags),
                 _uid: accountId.toString(),
-                device: session.device.payload,
                 edits: {
                     crop_original_size:["$width","$height"],
                     crop_center: ["$zero","$negativeZero"],
                     crop_zoom: "$crop"
                 },
-                extra: {
-                    source_width: width,
-                    source_height: height
-                }
+                camera_model: session.device.info.model,
+                scene_capture_type: 'standard',
+                device_id: session.device.id,
+                creation_logger_session_id: await session._cookiesStore.getSessionId(),
+                software: '1',
+                camera_make: session.device.info.manufacturer,
             });
             payload = payload.replace(/\"\$width\"/gi, width.toFixed(1));
             payload = payload.replace(/\"\$height\"/gi, height.toFixed(1));
             payload = payload.replace(/\"\$zero\"/gi, (0).toFixed(1));
             payload = payload.replace(/\"\$negativeZero\"/gi, "-" + (0).toFixed(1));
             payload = payload.replace(/\"\$crop\"/gi, CROP.toFixed(1));
-
             return new Request(session)
                 .setMethod('POST')
                 .setResource('mediaConfigure')
                 .setBodyType('form')
-                .setData(JSON.parse(payload))
+                .setData(payload)
                 .generateUUID()
                 .signPayload()
                 .send()

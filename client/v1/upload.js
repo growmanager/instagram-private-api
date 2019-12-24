@@ -27,6 +27,46 @@ Upload.prototype.parseParams = function (json) {
 };
 
 
+Upload.rphoto = async function (session, streamOrPathOrBuffer, uploadId) {
+    var data = Buffer.isBuffer(streamOrPathOrBuffer) ? streamOrPathOrBuffer : await Helpers.pathToBuffer(streamOrPathOrBuffer);
+    // This compresion is just default one
+    var predictedUploadId = uploadId || new Date().getTime();
+    var request = new Request(session);
+
+    const ruploadParams = {
+        retry_context: JSON.stringify({ num_step_auto_retry: 0, num_reupload: 0, num_step_manual_retry: 0 }),
+        media_type: '1',
+        upload_id: predictedUploadId.toString(),
+        xsharing_user_ids: JSON.stringify([]),
+        image_compression: JSON.stringify({ lib_name: 'moz', lib_version: '3.1.m', quality: '80' }),
+    };
+    const name = `${predictedUploadId}_0_${_.random(1000000000, 9999999999)}`;
+    const contentLength = data.byteLength;
+
+    const headers = {
+        X_FB_PHOTO_WATERFALL_ID: Helpers.generateUUID(),
+        'X-Entity-Type': 'image/jpeg',
+        Offset: 0,
+        'X-Instagram-Rupload-Params': JSON.stringify(ruploadParams),
+        'X-Entity-Name': name,
+        'X-Entity-Length': contentLength,
+        'Content-Type': 'application/octet-stream',
+        'Content-Length': contentLength,
+        'Accept-Encoding': 'gzip',
+    };
+
+    return request.setMethod('POST')
+        .setResource('ruploadPhoto_vnone', {name: name})
+        .generateUUID()
+        .setHeaders(headers)
+        .setBodyType('body')
+        .setData(data)
+        .send()
+        .then(function(json) {
+            return new Upload(session, json);
+        })
+};
+
 Upload.photo = function (session, streamOrPathOrBuffer, uploadId, name, isSidecar) {
     var data = Buffer.isBuffer(streamOrPathOrBuffer) ? streamOrPathOrBuffer : Helpers.pathToStream(streamOrPathOrBuffer);
     // This compresion is just default one

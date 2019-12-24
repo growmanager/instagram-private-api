@@ -133,7 +133,7 @@ Request.prototype.setData = function(data, override) {
         this._request.data = {};
         return this;
     }
-    if(_.isString(data)) {
+    if(_.isString(data) || Buffer.isBuffer(data)) {
         this._request.data = data;
         return this;
     }
